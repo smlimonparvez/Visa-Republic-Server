@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express()
 require('dotenv').config();
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 5000
 
 // middleware
 app.use(cors());
@@ -27,9 +27,24 @@ async function run() {
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+    const visaCollection = client.db("visaDB").collection("visas");
+
+    app.get('/visas', async (req, res) => {
+      const cursor = visaCollection.find({});
+      const visas = await cursor.toArray();
+      res.json(visas);
+    })
+    
+    app.post('/visas', async (req, res) => {
+      const newVisa = req.body;
+      const result = await visaCollection.insertOne(newVisa);
+      res.json(result);
+    })
+
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
