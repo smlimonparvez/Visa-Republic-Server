@@ -29,13 +29,16 @@ async function run() {
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
     const visaCollection = client.db("visaDB").collection("visas");
+    const visaApplicationsCollection = client.db("visa_applications").collection("visa_application_collection");
 
+    // get all visas
     app.get('/visa', async (req, res) => {
       const cursor = visaCollection.find({});
       const visas = await cursor.toArray();
       res.json(visas);
     })
 
+    // get a visa
     app.get('/visa/:id', async (req, res) => {
       const id = req.params.id;
       const query = {_id: new ObjectId(id)};
@@ -43,12 +46,14 @@ async function run() {
       res.json(visa);
     })
 
+    // create a visa
     app.post('/visa', async (req, res) => {
       const newVisa = req.body;
       const result = await visaCollection.insertOne(newVisa);
       res.json(result);
     })
 
+    // update a visa
     app.put('visa/:id', async (req, res) => {
       const id = req.params.id;
       const query = {_id: new ObjectId(id)};
@@ -60,10 +65,18 @@ async function run() {
       res.json(result);
     })
 
+    // Delete a visa
     app.delete('/visa/:id', async (req, res) => {
       const id = req.params.id;
       const query = {_id: new ObjectId(id)};
       const result = await visaCollection.deleteOne(query);
+      res.json(result);
+    })
+
+    // Apply for a visa
+    app.post('/visa-application', async (req, res) => {
+      const newApplyVisa = req.body;
+      const result = await visaApplicationsCollection.insertOne(newApplyVisa);
       res.json(result);
     })
 
