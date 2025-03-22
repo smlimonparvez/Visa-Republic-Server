@@ -49,6 +49,24 @@ async function run() {
       res.json(result);
     })
 
+    app.put('visa/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const updatedVisa = req.body;
+      const updateDoc = {
+        $set: updatedVisa,
+      };
+      const result = await visaCollection.updateOne(query, updateDoc);
+      res.json(result);
+    })
+
+    app.delete('/visa/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await visaCollection.deleteOne(query);
+      res.json(result);
+    })
+
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
