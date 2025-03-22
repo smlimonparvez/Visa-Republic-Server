@@ -8,7 +8,7 @@ const port = process.env.PORT || 5000
 app.use(cors());
 app.use(express.json());
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.w3tuc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -30,13 +30,20 @@ async function run() {
 
     const visaCollection = client.db("visaDB").collection("visas");
 
-    app.get('/visas', async (req, res) => {
+    app.get('/visa', async (req, res) => {
       const cursor = visaCollection.find({});
       const visas = await cursor.toArray();
       res.json(visas);
     })
-    
-    app.post('/visas', async (req, res) => {
+
+    app.get('/visa/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const visa = await visaCollection.findOne(query);
+      res.json(visa);
+    })
+
+    app.post('/visa', async (req, res) => {
       const newVisa = req.body;
       const result = await visaCollection.insertOne(newVisa);
       res.json(result);
