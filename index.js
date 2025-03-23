@@ -38,6 +38,16 @@ async function run() {
       res.json(visas);
     })
 
+    // get all visas by specific user
+    app.get('/my-visa', async (req, res) => {
+      const userEmail = req.params.userEmail;
+      const query = {userEmail: userEmail};
+      const cursor = visaCollection.find(query);
+      const visas = await cursor.toArray();
+      res.json(visas);
+    })
+
+
     // get a visa
     app.get('/visa/:id', async (req, res) => {
       const id = req.params.id;
