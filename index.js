@@ -38,6 +38,13 @@ async function run() {
       res.json(visas);
     })
 
+    // get only 6 visas
+    app.get('/visa-limited', async (req, res) => {
+      const cursor = visaCollection.find({}).limit(6);
+      const visas = await cursor.toArray();
+      res.json(visas);
+    })
+
     // get all visas by specific user
     app.get('/my-visa', async (req, res) => {
       const userEmail = req.params.userEmail;
@@ -64,7 +71,7 @@ async function run() {
     })
 
     // update a visa
-    app.put('visa/:id', async (req, res) => {
+    app.put('/visa/:id', async (req, res) => {
       const id = req.params.id;
       const query = {_id: new ObjectId(id)};
       const updatedVisa = req.body;
