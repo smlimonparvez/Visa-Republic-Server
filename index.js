@@ -51,11 +51,12 @@ async function run() {
 
     // get all visas by specific user
     app.get("/my-visa", async (req, res) => {
-      const userEmail = req.params.userEmail;
+      const userEmail = req.query.userEmail;
+      // console.log("Received userEmail:", userEmail);
 
-      // if (!userEmail) {
-      //   return res.status(400).send("User email is required");
-      // }
+      if (!userEmail) {
+        return res.status(400).send("User email is required");
+      }
 
       const query = { userEmail: userEmail };
       const cursor = visaCollection.find(query);
@@ -107,7 +108,7 @@ async function run() {
 
     // get all visa application by specific user
     app.get("/my-visa-application", async (req, res) => {
-      const userEmail = req.query.userEmail;
+      const userEmail = req.params.userEmail;
       const query = { userEmail: userEmail };
       const cursor = visaApplicationsCollection.find(query);
       const visaApplication = await cursor.toArray();
@@ -115,7 +116,7 @@ async function run() {
       // Join with visa collection to get full visa details
       const applicationsDetails = await Promise.all(
         visaApplication.map(async (application) => {
-          const visaId = application.visaId;
+          const visaId = application._id;
           const visaQuery = { _id: new ObjectId(visaId) };
           const visa = await visaCollection.findOne(visaQuery);
           return {
@@ -131,6 +132,14 @@ async function run() {
         })
       );
       res.json(applicationsDetails);
+    });
+
+    // visa application delete
+    app.delete("/visa-application/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await visaApplicationsCollection.deleteOne(query);
+      res.json(result);
     });
   } finally {
     // Ensures that the client will close when you finish/error
