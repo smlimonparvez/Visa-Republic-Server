@@ -102,13 +102,29 @@ async function run() {
     // Apply for a visa
     app.post("/visa-application", async (req, res) => {
       const newApplyVisa = req.body;
+      const { visaId, userEmail } = newApplyVisa;
+      console.log("Received newApplyVisa:", newApplyVisa);
+      if (!visaId || !ObjectId.isValid(visaId)) {
+        return res.status(400).json({ error: "Invalid or missing visaId" });
+      }
+    
+      if (!userEmail) {
+        return res.status(400).json({ error: "User email is required" });
+      }
+      
       const result = await visaApplicationsCollection.insertOne(newApplyVisa);
       res.json(result);
     });
 
     // get all visa application by specific user
     app.get("/my-visa-application", async (req, res) => {
-      const userEmail = req.params.userEmail;
+      const userEmail = req.query.userEmail;
+       console.log("Received userEmail:", userEmail);
+
+       if (!userEmail) {
+        return res.status(400).send("User email is required");
+      }
+
       const query = { userEmail: userEmail };
       const cursor = visaApplicationsCollection.find(query);
       const visaApplication = await cursor.toArray();
@@ -116,7 +132,11 @@ async function run() {
       // Join with visa collection to get full visa details
       const applicationsDetails = await Promise.all(
         visaApplication.map(async (application) => {
-          const visaId = application._id;
+          const visaId = application.visaId;
+          // Check if visaId is valid before querying the visa collection
+          if(!visaId || !ObjectId.isValid(visaId)) {
+            return application; 
+          }
           const visaQuery = { _id: new ObjectId(visaId) };
           const visa = await visaCollection.findOne(visaQuery);
           return {
