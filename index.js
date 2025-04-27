@@ -103,7 +103,7 @@ async function run() {
     app.post("/visa-application", async (req, res) => {
       const newApplyVisa = req.body;
       const { visaId, userEmail } = newApplyVisa;
-      console.log("Received newApplyVisa:", newApplyVisa);
+      // console.log("Received newApplyVisa:", newApplyVisa);
       if (!visaId || !ObjectId.isValid(visaId)) {
         return res.status(400).json({ error: "Invalid or missing visaId" });
       }
@@ -119,7 +119,7 @@ async function run() {
     // get all visa application by specific user
     app.get("/my-visa-application", async (req, res) => {
       const userEmail = req.query.userEmail;
-       console.log("Received userEmail:", userEmail);
+      //  console.log("Received userEmail:", userEmail);
 
        if (!userEmail) {
         return res.status(400).send("User email is required");
