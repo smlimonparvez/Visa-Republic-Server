@@ -44,7 +44,7 @@ async function run() {
 
     // get only 6 visas
     app.get("/visa-limited", async (req, res) => {
-      const cursor = visaCollection.find({}).limit(6);
+      const cursor = visaCollection.find({}).sort({_id: -1}).limit(6);
       const visas = await cursor.toArray();
       res.json(visas);
     });
